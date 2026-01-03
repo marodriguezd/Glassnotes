@@ -1,0 +1,7 @@
+PyQt6
+PyQt6-Fluent-Widgets
+google-api-python-client
+google-auth-oauthlib
+google-auth-httplib2
+darkdetect
+requests
