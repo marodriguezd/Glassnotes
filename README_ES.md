@@ -15,6 +15,7 @@ Una aplicación de bloc de notas moderna y de alto rendimiento con un diseño **
 - **Barra de Estado Rediseñada**: Barra modular contextual con contador de palabras, rastreo de línea/columna y controles de edición rápidos.
 - **Persistencia de Sesión**: Restaura automáticamente tus pestañas abiertas y contenido no guardado entre reinicios.
 - **Inicio Optimizado**: Se abre en resolución 720p y se centra automáticamente en tu pantalla.
+- **Acceso Universal a Archivos**: Abre cualquier archivo mediante arrastrar y soltar o el botón dedicado en el hub.
 - **Enfoque en Privacidad**: Todos los datos y configuraciones se guardan localmente en tu equipo.
 
 ## 🚀 Instalación

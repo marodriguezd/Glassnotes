@@ -184,6 +184,7 @@ class HubView(QWidget):
     """Premium glassmorphism hub with search, sorting, and enhanced UX"""
     open_note = pyqtSignal(str)
     new_note = pyqtSignal()
+    open_file_requested = pyqtSignal()
     refresh_requested = pyqtSignal()
     
     def __init__(self, parent=None):
@@ -274,7 +275,14 @@ class HubView(QWidget):
         new_btn.setFixedHeight(42)
         new_btn.clicked.connect(self.new_note.emit)
         
+        # Open File button
+        open_btn = PushButton(FIF.FOLDER, "Open File")
+        open_btn.setFixedHeight(42)
+        open_btn.setToolTip("Open external file")
+        open_btn.clicked.connect(self.open_file_requested.emit)
+        
         actions.addWidget(refresh_btn)
+        actions.addWidget(open_btn)
         actions.addWidget(new_btn)
         header_layout.addLayout(actions)
         

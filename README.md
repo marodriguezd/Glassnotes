@@ -15,6 +15,7 @@ A modern, high-performance notepad application featuring a premium **Glassmorphi
 - **Redesigned Status Bar**: Context-aware modular bar with word count, line/col tracking, and quick-access edit controls.
 - **Session Persistence**: Automatically restores your open tabs and unsaved content between restarts.
 - **Optimized Startup**: Opens with a standard 720p resolution and centers itself on your screen.
+- **Universal File Access**: Open any file via drag & drop or the dedicated hub button.
 - **Privacy Focused**: All data and settings are stored locally on your machine.
 
 ## 🚀 Installation

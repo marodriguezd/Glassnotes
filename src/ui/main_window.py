@@ -168,6 +168,7 @@ class MainWindow(MSFluentWindow):
         height = config.get("window_height", 720)
         self.resize(width, height)
         self.setMinimumSize(900, 600)
+        self.setAcceptDrops(True) # Enable Drag & Drop
         self._center_window()
         
         # Theme setup
@@ -245,6 +246,7 @@ class MainWindow(MSFluentWindow):
         self.hub.new_note.connect(lambda: self.add_new_tab())
         self.hub.open_note.connect(self.open_file_path)
         self.hub.refresh_requested.connect(self.update_hub_data)
+        self.hub.open_file_requested.connect(self.open_file_dialog)
         self.hub.login_btn.clicked.connect(self.login_google)
         
         # Settings view
@@ -370,6 +372,27 @@ class MainWindow(MSFluentWindow):
                 48
             )
             self.status_bar_frame.raise_()
+
+    def dragEnterEvent(self, event):
+        """Handle drag enter for file dropping"""
+        if event.mimeData().hasUrls():
+            event.accept()
+        else:
+            event.ignore()
+
+    def dropEvent(self, event):
+        """Handle dropping of files"""
+        files = [u.toLocalFile() for u in event.mimeData().urls()]
+        for f in files:
+            # Check for valid text extensions or try to open
+            if f and os.path.exists(f):
+                # Basic check for text-like extensions, but we can try opening anything
+                # or let open_file_path handle it.
+                # Ideally, we only accept text/code files.
+                valid_exts = ('.txt', '.md', '.py', '.js', '.html', '.css', '.json', '.xml', '.yaml', '.yml')
+                if f.lower().endswith(valid_exts) or os.path.getsize(f) < 1000000: # Allow small files regardless of ext
+                    self.open_file_path(f)
+                    
 
     def _on_view_changed(self, index):
         """Toggle status bar visibility based on current view"""
@@ -648,7 +671,7 @@ class MainWindow(MSFluentWindow):
             self,
             "Open Note",
             str(config.NOTES_DIR),
-            "Text Files (*.txt *.md);;All Files (*)"
+            "Supported Files (*.txt *.md *.py *.js *.html *.css *.json *.xml *.yaml *.yml *.ini *.log);;All Files (*)"
         )
         if path:
             self.open_file_path(path)
