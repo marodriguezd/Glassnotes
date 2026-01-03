@@ -55,4 +55,4 @@ python run.py
 
 ## 🛠️ Requisitos
 - Python 3.8+
-- Windows 10/11 (para mejores efectos de acrílico)
+- Multiplataforma (Windows, Linux, macOS)
