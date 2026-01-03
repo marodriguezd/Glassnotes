@@ -241,6 +241,14 @@ class MainWindow(MSFluentWindow):
         self.tabs.tabAddRequested.connect(lambda: self.add_new_tab())
         self.tabs.currentChanged.connect(self._on_tab_changed)
         
+        # Container for tabs to accommodate status bar
+        self.tabs_container = QWidget()
+        self.tabs_container.setObjectName("EditorTabsContainer")
+        container_layout = QVBoxLayout(self.tabs_container)
+        container_layout.setContentsMargins(0, 0, 0, 48) # Reserve space for status bar
+        container_layout.setSpacing(0)
+        container_layout.addWidget(self.tabs)
+        
         # Hub view
         self.hub = HubView()
         self.hub.new_note.connect(lambda: self.add_new_tab())
@@ -258,7 +266,7 @@ class MainWindow(MSFluentWindow):
         """Setup navigation sidebar"""
         # Main navigation items
         self.addSubInterface(self.hub, FIF.HOME, "Home")
-        self.addSubInterface(self.tabs, FIF.EDIT, "Editor")
+        self.addSubInterface(self.tabs_container, FIF.EDIT, "Editor")
         
         # Bottom navigation items
         self.addSubInterface(
@@ -397,7 +405,7 @@ class MainWindow(MSFluentWindow):
     def _on_view_changed(self, index):
         """Toggle status bar visibility based on current view"""
         widget = self.stackedWidget.widget(index)
-        if widget == self.tabs:
+        if widget == self.tabs_container:
             self.status_bar_frame.show()
         else:
             self.status_bar_frame.hide()
@@ -565,7 +573,7 @@ class MainWindow(MSFluentWindow):
         # Reset selection to first tab if any exist
         if self.tabs.count() > 0:
             self.tabs.setCurrentIndex(0)
-            self.switchTo(self.tabs)
+            self.switchTo(self.tabs_container)
 
     def update_hub_data(self):
         """Refresh hub with current data"""
@@ -650,7 +658,7 @@ class MainWindow(MSFluentWindow):
         
         index = self.tabs.addTab(editor, name)
         self.tabs.setCurrentIndex(index)
-        self.switchTo(self.tabs)
+        self.switchTo(self.tabs_container)
         
         # Initial status - trigger count update
         text = editor.get_content()
