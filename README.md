@@ -1,6 +1,6 @@
 # Glassnotes
 
-<img src="assets/app_mockup.png" width="400" alt="Glassnotes Interface">
+<img src="https://raw.githubusercontent.com/marodriguezd/Glassnotes/main/assets/demo.png" width="400" alt="Glassnotes Interface">
 
 A modern, high-performance notepad application featuring a premium **Glassmorphism** (Acrylic) design, inspired by the aesthetics of Windows 11 and the functionality of tools like Sublime Text.
 
