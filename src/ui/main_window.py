@@ -164,6 +164,7 @@ class MainWindow(MSFluentWindow):
         
         # Window configuration
         self.setWindowTitle("Glassnotes")
+        self.setWindowIcon(QIcon(config.get_resource_path("assets/icon.ico")))
         width = config.get("window_width", 1280)
         height = config.get("window_height", 720)
         self.resize(width, height)

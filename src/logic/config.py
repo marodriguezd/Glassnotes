@@ -4,6 +4,7 @@ Handles app settings, paths, and persistence
 """
 import os
 import json
+import sys
 from pathlib import Path
 
 
@@ -16,6 +17,17 @@ class Config:
     CONFIG_FILE = APP_DIR / "config.json"
     NOTES_DIR = APP_DIR / "notes"
     BACKUP_DIR = APP_DIR / "backups"
+
+    @staticmethod
+    def get_resource_path(relative_path):
+        """Get absolute path to resource, works for dev and for PyInstaller"""
+        try:
+            # PyInstaller creates a temp folder and stores path in _MEIPASS
+            base_path = sys._MEIPASS
+        except Exception:
+            base_path = os.path.abspath(".")
+
+        return os.path.join(base_path, relative_path)
 
     def __init__(self):
         self._ensure_dirs()
