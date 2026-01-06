@@ -2,7 +2,7 @@
 
 [🇺🇸 English Version](README.md)
 
-<img src="https://raw.githubusercontent.com/marodriguezd/Glassnotes/main/assets/demo.png" width="800" alt="Interfaz de Glassnotes">
+<img src="https://raw.githubusercontent.com/marodriguezd/Glassnotes/main/assets/demov2.png" width="800" alt="Interfaz de Glassnotes">
 
 Una aplicación de bloc de notas moderna y de alto rendimiento con un diseño **Glassmorphism** (Acrílico) premium, inspirada en la estética de Windows 11 y la funcionalidad de herramientas como Sublime Text.
 
