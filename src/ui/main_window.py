@@ -312,6 +312,7 @@ class MainWindow(MSFluentWindow):
         self.hub.open_note.connect(self.open_file_path)
         self.hub.refresh_requested.connect(self.update_hub_data)
         self.hub.open_file_requested.connect(self.open_file_dialog)
+        self.hub.file_deleted.connect(self.close_tabs_with_path)
         self.hub.login_btn.clicked.connect(self.login_google)
 
         # Settings view
@@ -986,8 +987,6 @@ class MainWindow(MSFluentWindow):
         """Close a tab by index"""
         editor = self.tabs.widget(index)
         if isinstance(editor, Editor) and editor.file_path:
-            # If it was a backup file, we can optionally clean it up,
-            # though _save_session handles current state.
             pass
 
         self.tabs.removeTab(index)
@@ -996,3 +995,12 @@ class MainWindow(MSFluentWindow):
         if self.tabs.count() == 0:
             self.switchTo(self.hub)
             self.status_widget.set_modified(False)
+
+    def close_tabs_with_path(self, path):
+        """Close all tabs that have the given file path open"""
+        for i in range(self.tabs.count()):
+            editor = self.tabs.widget(i)
+            if isinstance(editor, Editor) and editor.file_path == path:
+                self.tabs.removeTab(i)
+                break
+        self._save_session()
