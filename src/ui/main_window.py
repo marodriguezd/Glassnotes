@@ -313,6 +313,8 @@ class MainWindow(MSFluentWindow):
         self.hub.refresh_requested.connect(self.update_hub_data)
         self.hub.open_file_requested.connect(self.open_file_dialog)
         self.hub.file_deleted.connect(self.close_tabs_with_path)
+        self.hub.unlink_all_requested.connect(self.hub.unlink_all_notes)
+        self.hub.delete_all_requested.connect(self.hub.delete_all_notes)
         self.hub.login_btn.clicked.connect(self.login_google)
 
         # Settings view
@@ -538,26 +540,11 @@ class MainWindow(MSFluentWindow):
         """Handle dropping of files"""
         files = [u.toLocalFile() for u in event.mimeData().urls()]
         for f in files:
-            # Check for valid text extensions or try to open
             if f and os.path.exists(f):
-                # Basic check for text-like extensions, but we can try opening anything
-                # or let open_file_path handle it.
-                # Ideally, we only accept text/code files.
-                valid_exts = (
-                    ".txt",
-                    ".md",
-                    ".py",
-                    ".js",
-                    ".html",
-                    ".css",
-                    ".json",
-                    ".xml",
-                    ".yaml",
-                    ".yml",
-                )
                 if (
-                    f.lower().endswith(valid_exts) or os.path.getsize(f) < 1000000
-                ):  # Allow small files regardless of ext
+                    f.lower().endswith(config.SUPPORTED_TEXT_FORMATS)
+                    or os.path.getsize(f) < 1000000
+                ):
                     self.open_file_path(f)
 
     def _on_view_changed(self, index):
@@ -851,11 +838,13 @@ class MainWindow(MSFluentWindow):
 
     def open_file_dialog(self):
         """Open file picker dialog"""
+        formats_str = " ".join(f"*{ext}" for ext in config.SUPPORTED_TEXT_FORMATS)
+        filter_str = f"Supported Files ({formats_str});;All Files (*)"
         path, _ = QFileDialog.getOpenFileName(
             self,
             "Open Note",
             str(config.NOTES_DIR),
-            "Supported Files (*.txt *.md *.py *.js *.html *.css *.json *.xml *.yaml *.yml *.ini *.log);;All Files (*)",
+            filter_str,
         )
         if path:
             self.open_file_path(path)
@@ -919,11 +908,13 @@ class MainWindow(MSFluentWindow):
 
         # Local save
         if not hasattr(editor, "file_path") or editor.file_path is None:
+            formats_str = " ".join(f"*{ext}" for ext in config.SUPPORTED_TEXT_FORMATS)
+            filter_str = f"Text Files ({formats_str});;All Files (*)"
             path, _ = QFileDialog.getSaveFileName(
                 self,
                 "Save Note",
                 str(config.NOTES_DIR),
-                "Text Files (*.txt);;Markdown (*.md);;All Files (*)",
+                filter_str,
             )
             if path:
                 editor.file_path = path

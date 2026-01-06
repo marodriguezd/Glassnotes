@@ -239,6 +239,8 @@ class HubView(QWidget):
     open_file_requested = pyqtSignal()
     refresh_requested = pyqtSignal()
     file_deleted = pyqtSignal(str)
+    unlink_all_requested = pyqtSignal()
+    delete_all_requested = pyqtSignal()
 
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -269,9 +271,15 @@ class HubView(QWidget):
 
         # Local Notes Section
         self.local_section, self.local_list_layout = self._create_section(
-            "Local Notes", "📁", "Your notes saved locally"
+            "Local Notes", "📁", "Your notes saved locally", show_unlink_all=True
         )
         self.local_count_badge = self.local_section.findChild(QLabel, "count_badge")
+        self.local_unlink_all_btn = self.local_section.findChild(
+            TransparentToolButton, "unlink_all_btn"
+        )
+        self.local_delete_all_btn = self.local_section.findChild(
+            TransparentToolButton, "delete_all_btn"
+        )
 
         # Cloud Notes Section
         self.cloud_section, self.cloud_list_layout = self._create_section(
@@ -368,7 +376,7 @@ class HubView(QWidget):
 
         parent_layout.addWidget(search_container)
 
-    def _create_section(self, title, icon, description):
+    def _create_section(self, title, icon, description, show_unlink_all=False):
         """Create a notes section with header, scroll area, and content"""
         container = QWidget()
         container.setObjectName("SectionContainer")
@@ -400,10 +408,56 @@ class HubView(QWidget):
             font-weight: 600;
         """)
 
+        # Unlink All button (only for local notes section)
+        unlink_all_btn = None
+        delete_all_btn = None
+        if show_unlink_all:
+            unlink_all_btn = TransparentToolButton(FIF.REMOVE, self)
+            unlink_all_btn.setFixedSize(28, 28)
+            unlink_all_btn.setToolTip("Remove all from history")
+            unlink_all_btn.setObjectName("unlink_all_btn")
+            unlink_all_btn.setStyleSheet("""
+                TransparentToolButton {
+                    background: transparent;
+                    border: none;
+                    border-radius: 6px;
+                    padding: 4px;
+                }
+                TransparentToolButton:hover {
+                    background: rgba(156, 163, 175, 0.2);
+                    border: 1px solid rgba(156, 163, 175, 0.3);
+                }
+            """)
+            unlink_all_btn.clicked.connect(self.unlink_all_requested.emit)
+            unlink_all_btn.hide()
+
+            delete_all_btn = TransparentToolButton(FIF.DELETE, self)
+            delete_all_btn.setFixedSize(28, 28)
+            delete_all_btn.setToolTip("Delete all from system")
+            delete_all_btn.setObjectName("delete_all_btn")
+            delete_all_btn.setStyleSheet("""
+                TransparentToolButton {
+                    background: transparent;
+                    border: none;
+                    border-radius: 6px;
+                    padding: 4px;
+                }
+                TransparentToolButton:hover {
+                    background: rgba(239, 68, 68, 0.2);
+                    border: 1px solid rgba(239, 68, 68, 0.3);
+                }
+            """)
+            delete_all_btn.clicked.connect(self.delete_all_requested.emit)
+            delete_all_btn.hide()
+
         header.addWidget(icon_label)
         header.addWidget(title_label)
         header.addWidget(count_badge)
         header.addStretch()
+        if unlink_all_btn:
+            header.addWidget(unlink_all_btn)
+        if delete_all_btn:
+            header.addWidget(delete_all_btn)
         layout.addLayout(header)
 
         # Login container (for cloud section)
@@ -548,6 +602,58 @@ class HubView(QWidget):
                 parent=self,
             )
 
+    def unlink_all_notes(self):
+        """Remove all notes from app history without deleting files"""
+        count = len(self._local_notes)
+        if count == 0:
+            return
+
+        reply = QMessageBox.question(
+            self,
+            "Remove All from History",
+            f"Remove all {count} notes from history?\nFiles will be kept on your system.",
+            QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
+            QMessageBox.StandardButton.No,
+        )
+
+        if reply == QMessageBox.StandardButton.Yes:
+            for path in self._local_notes:
+                config.remove_recent_file(path)
+            self.refresh_requested.emit()
+            InfoBar.info(
+                "Removed All",
+                f"{count} notes removed from history",
+                duration=3000,
+                parent=self,
+            )
+
+    def delete_all_notes(self):
+        """Delete all notes from system and remove from history"""
+        count = len(self._local_notes)
+        if count == 0:
+            return
+
+        reply = QMessageBox.question(
+            self,
+            "Delete All Notes",
+            f"Delete all {count} notes from your system?\nThis action cannot be undone.",
+            QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
+            QMessageBox.StandardButton.No,
+        )
+
+        if reply == QMessageBox.StandardButton.Yes:
+            for path in self._local_notes:
+                file_manager.delete_file(path)
+                config.remove_recent_file(path)
+                self.file_deleted.emit(path)
+            self.refresh_requested.emit()
+            InfoBar.success(
+                "Deleted All",
+                f"{count} notes deleted successfully",
+                duration=3000,
+                parent=self,
+            )
+
     def update_cloud_list(self, drive_notes, skip_store=False):
         """Update cloud notes display"""
         if not skip_store:
@@ -604,6 +710,19 @@ class HubView(QWidget):
         # Update count badge
         if self.local_count_badge:
             self.local_count_badge.setText(str(len(notes)))
+
+        # Show/hide unlink all and delete all buttons based on count
+        if self.local_unlink_all_btn:
+            if len(notes) > 0:
+                self.local_unlink_all_btn.show()
+            else:
+                self.local_unlink_all_btn.hide()
+
+        if self.local_delete_all_btn:
+            if len(notes) > 0:
+                self.local_delete_all_btn.show()
+            else:
+                self.local_delete_all_btn.hide()
 
         if not notes:
             empty = QLabel("No local notes yet. Create your first note!")
