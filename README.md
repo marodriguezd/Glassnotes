@@ -52,6 +52,9 @@ python run.py
 | `Ctrl + =` | Zoom In |
 | `Ctrl + -` | Zoom Out |
 | `Ctrl + 0` | Reset Zoom |
+| `Ctrl + F` | Search |
+| `F3` | Find Next |
+| `Shift + F3` | Find Previous |
 
 ## 🛠️ Requirements
 - Python 3.8+

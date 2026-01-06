@@ -52,6 +52,9 @@ python run.py
 | `Ctrl + =` | Acercar (Zoom In) |
 | `Ctrl + -` | Alejar (Zoom Out) |
 | `Ctrl + 0` | Restablecer Zoom |
+| `Ctrl + F` | Buscar |
+| `F3` | Buscar Siguiente |
+| `Shift + F3` | Buscar Anterior |
 
 ## 🛠️ Requisitos
 - Python 3.8+
