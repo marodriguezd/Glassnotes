@@ -3,40 +3,41 @@ Glassnotes Premium Theme System
 Centralized styling for consistent premium glassmorphism aesthetics
 """
 
+
 class GlassColors:
     """Premium color palette for glassmorphism design"""
-    
+
     # Primary accent colors
     PRIMARY = "#9D46FF"
     PRIMARY_LIGHT = "#B76EFF"
     PRIMARY_DARK = "#7B35CC"
     PRIMARY_GLOW = "rgba(157, 70, 255, 0.4)"
-    
+
     # Background gradient stops
     BG_DARK_1 = "#0a0612"
     BG_DARK_2 = "#12081f"
     BG_DARK_3 = "#1a0f2e"
     BG_ACCENT = "#0f0a1a"
-    
+
     # Glass surface colors
     GLASS_BG = "rgba(25, 18, 40, 0.85)"
     GLASS_BG_HOVER = "rgba(40, 28, 65, 0.9)"
     GLASS_BORDER = "rgba(157, 70, 255, 0.15)"
     GLASS_BORDER_HOVER = "rgba(157, 70, 255, 0.4)"
     GLASS_BORDER_ACTIVE = "rgba(157, 70, 255, 0.6)"
-    
+
     # Text hierarchy
     TEXT_PRIMARY = "#FFFFFF"
     TEXT_SECONDARY = "rgba(255, 255, 255, 0.75)"
     TEXT_TERTIARY = "rgba(255, 255, 255, 0.5)"
     TEXT_MUTED = "rgba(255, 255, 255, 0.35)"
-    
+
     # Semantic colors
     SUCCESS = "#4ADE80"
     WARNING = "#FBBF24"
     ERROR = "#F87171"
     INFO = "#60A5FA"
-    
+
     # Card colors
     CARD_BG = "rgba(35, 25, 55, 0.75)"
     CARD_BG_HOVER = "rgba(55, 40, 85, 0.85)"
@@ -44,20 +45,20 @@ class GlassColors:
 
 class GlassEffects:
     """Glassmorphism effect constants"""
-    
+
     BLUR_LIGHT = "10px"
     BLUR_MEDIUM = "20px"
     BLUR_HEAVY = "30px"
-    
+
     BORDER_RADIUS_SM = "8px"
     BORDER_RADIUS_MD = "12px"
     BORDER_RADIUS_LG = "16px"
     BORDER_RADIUS_XL = "24px"
-    
+
     SHADOW_SUBTLE = "0 4px 16px rgba(0, 0, 0, 0.2)"
     SHADOW_MEDIUM = "0 8px 32px rgba(0, 0, 0, 0.3)"
     SHADOW_GLOW = "0 0 30px rgba(157, 70, 255, 0.3)"
-    
+
     TRANSITION_FAST = "150ms"
     TRANSITION_NORMAL = "250ms"
     TRANSITION_SLOW = "400ms"
@@ -495,5 +496,34 @@ def get_settings_style():
         
         SwitchButton:checked {{
             background: {GlassColors.PRIMARY};
+        }}
+    """
+
+
+def get_search_bar_style():
+    """Premium glassmorphism style for search bar"""
+    return f"""
+        #SearchInput, SearchBar QLineEdit {{
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid {GlassColors.GLASS_BORDER};
+            border-radius: {GlassEffects.BORDER_RADIUS_SM};
+            color: {GlassColors.TEXT_PRIMARY};
+            padding: 8px 14px;
+            font-size: 13px;
+            selection-background-color: {GlassColors.PRIMARY};
+        }}
+        
+        #SearchInput:focus, SearchBar QLineEdit:focus {{
+            border-color: {GlassColors.GLASS_BORDER_ACTIVE};
+            background: rgba(255, 255, 255, 0.08);
+        }}
+        
+        #SearchBar {{
+            background: qlineargradient(
+                x1:0, y1:0, x2:0, y2:1,
+                stop:0 rgba(30, 22, 50, 0.98),
+                stop:1 rgba(20, 15, 35, 0.98)
+            );
+            border-top: 1px solid {GlassColors.GLASS_BORDER};
         }}
     """
