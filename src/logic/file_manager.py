@@ -1,7 +1,24 @@
 import os
 from pathlib import Path
+from functools import lru_cache
+from typing import Optional, List
 
 from src.logic.config import Config
+
+
+@lru_cache(maxsize=128)
+def _get_file_preview_cached(path: str, max_bytes: int = 200) -> str:
+    """Cached file preview - use cache key (path, max_bytes)"""
+    try:
+        with open(path, "r", encoding="utf-8", errors="ignore") as f:
+            return f.read(max_bytes)
+    except Exception:
+        return ""
+
+
+def clear_preview_cache():
+    """Clear the preview cache - call when files change"""
+    _get_file_preview_cached.cache_clear()
 
 
 class FileManager:
@@ -38,6 +55,11 @@ class FileManager:
         except Exception as e:
             print(f"Error listing files: {e}")
         return files
+
+    @staticmethod
+    def get_file_preview(path: str, max_bytes: int = 200) -> str:
+        """Get first few lines of a file as preview (cached)"""
+        return _get_file_preview_cached(path, max_bytes)
 
     @staticmethod
     def delete_file(path):

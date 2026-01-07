@@ -370,6 +370,13 @@ def get_editor_style():
 def get_hub_style():
     """Premium glassmorphism style for the hub view"""
     return f"""
+        #HubView {{
+            background-color: {GlassColors.GLASS_BG};
+            border: 1px solid {GlassColors.GLASS_BORDER};
+            border-radius: {GlassEffects.BORDER_RADIUS_LG};
+            margin: 8px 8px 2px 8px;
+        }}
+
         /* Section Headers */
         #SectionHeader {{
             background: transparent;
@@ -378,15 +385,14 @@ def get_hub_style():
             color: {GlassColors.TEXT_PRIMARY};
             padding: 8px 0px;
         }}
-        
-        /* Search Bar Container */
+
         #SearchContainer {{
-            background: rgba(255, 255, 255, 0.03);
-            border: 1px solid {GlassColors.GLASS_BORDER};
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(157, 70, 255, 0.12);
             border-radius: {GlassEffects.BORDER_RADIUS_MD};
-            padding: 8px 16px;
+            padding: 12px 20px;
         }}
-        
+
         /* Welcome Title */
         #WelcomeTitle {{
             font-size: 36px;
@@ -394,22 +400,26 @@ def get_hub_style():
             color: {GlassColors.TEXT_PRIMARY};
             background: transparent;
         }}
-        
+
         /* Subtitle */
         #WelcomeSubtitle {{
             font-size: 14px;
             color: {GlassColors.TEXT_TERTIARY};
             background: transparent;
         }}
-        
-        /* Section Container */
-        #SectionContainer {{
-            background: rgba(255, 255, 255, 0.02);
-            border: 1px solid rgba(157, 70, 255, 0.08);
-            border-radius: {GlassEffects.BORDER_RADIUS_LG};
-            padding: 16px;
+
+        /* Settings Card (used for note sections) */
+        #SettingsSection {{
+            background: transparent;
+            margin-bottom: 24px;
         }}
-        
+
+        #SettingsCard {{
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(157, 70, 255, 0.12);
+            border-radius: 12px;
+        }}
+
         /* Badge / Count */
         #CountBadge {{
             background: rgba(157, 70, 255, 0.2);
@@ -419,7 +429,7 @@ def get_hub_style():
             font-size: 12px;
             font-weight: 600;
         }}
-        
+
         /* Empty State */
         #EmptyState {{
             color: {GlassColors.TEXT_MUTED};
@@ -432,25 +442,37 @@ def get_hub_style():
 def get_settings_style():
     """Premium glassmorphism style for settings panel"""
     return f"""
-        #SettingsPanel {{
-            background: {GlassColors.GLASS_BG};
+        #SettingsView {{
+            background-color: {GlassColors.GLASS_BG};
             border: 1px solid {GlassColors.GLASS_BORDER};
             border-radius: {GlassEffects.BORDER_RADIUS_LG};
+            margin: 8px 8px 2px 8px;
         }}
         
         #SettingsSection {{
-            background: rgba(255, 255, 255, 0.02);
-            border: 1px solid rgba(157, 70, 255, 0.08);
-            border-radius: {GlassEffects.BORDER_RADIUS_MD};
-            padding: 20px;
-            margin: 8px 0px;
+            background: transparent;
+            margin-bottom: 24px;
+        }}
+        
+        #SectionHeader {{
+            font-size: 20px;
+            font-weight: 600;
+            color: {GlassColors.TEXT_PRIMARY};
+            background: transparent;
+        }}
+        
+        #SettingsCard {{
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(157, 70, 255, 0.12);
+            border-radius: 12px;
         }}
         
         #SettingsTitle {{
-            font-size: 24px;
+            font-size: 28px;
             font-weight: 700;
             color: {GlassColors.TEXT_PRIMARY};
-            padding-bottom: 16px;
+            padding-bottom: 8px;
+            background: transparent;
         }}
         
         #SettingLabel {{

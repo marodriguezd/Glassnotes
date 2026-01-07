@@ -9,6 +9,15 @@ import sys
 from pathlib import Path
 
 
+# =============================================================================
+# FUTURE: Google Drive Cloud Integration
+# =============================================================================
+# Status: NOT YET IMPLEMENTED - UI is hidden
+# To enable: Set ENABLE_CLOUD = True and implement drive_service.py
+# =============================================================================
+ENABLE_CLOUD = False
+
+
 class Config:
     """Application configuration manager"""
 

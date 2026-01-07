@@ -37,9 +37,17 @@ from src.ui.hub import HubView
 from src.ui.settings import SettingsView
 from src.ui.search_bar import SearchBar
 from src.ui.styles import get_main_window_style, get_search_bar_style, GlassColors
-from src.logic.config import config
+from src.logic.config import config, ENABLE_CLOUD
 from src.logic.file_manager import file_manager
 from src.logic.drive_service import drive_service
+
+
+# =============================================================================
+# FUTURE: Cloud Signal Connections (Google Drive)
+# =============================================================================
+# Status: NOT YET IMPLEMENTED - UI is hidden
+# To enable: Set ENABLE_CLOUD = True in src/logic/config.py
+# =============================================================================
 
 
 class StatusBarWidget(QWidget):
@@ -61,27 +69,18 @@ class StatusBarWidget(QWidget):
     def _setup_ui(self):
         layout = QHBoxLayout(self)
         layout.setContentsMargins(16, 4, 16, 4)
-        layout.setSpacing(10)
-
-        # Stats & Cursor Block
+        # Stats & Cursor (Directly on bar)
         self.stats_label = QLabel("0 words  •  0 characters")
         self.stats_label.setStyleSheet(
-            f"color: {GlassColors.TEXT_SECONDARY}; font-size: 11px; font-weight: 500;"
+            f"color: {GlassColors.TEXT_TERTIARY}; font-size: 11px; font-weight: 500; margin-left: 8px;"
         )
 
         self.cursor_label = QLabel("line 1, column 1")
         self.cursor_label.setStyleSheet(
-            f"color: {GlassColors.TEXT_SECONDARY}; font-size: 11px; font-weight: 500;"
+            f"color: {GlassColors.TEXT_TERTIARY}; font-size: 11px; font-weight: 500; margin-left: 16px;"
         )
 
-        info_block = self._create_block([self.stats_label, self.cursor_label])
-
-        # Consistent spacing within the unified info block
-        info_layout = info_block.layout()
-        info_layout.setSpacing(24)  # More breathing room between the two groups
-        info_layout.setContentsMargins(14, 0, 14, 0)
-
-        # Edit Block (Undo/Redo)
+        # Edit Group (Undo/Redo)
         self.undo_btn = TransparentToolButton(FIF.LEFT_ARROW)
         self.undo_btn.setFixedSize(28, 28)
         self.undo_btn.setIconSize(QSize(16, 16))
@@ -94,9 +93,12 @@ class StatusBarWidget(QWidget):
         self.redo_btn.setToolTip("Redo (Ctrl+Y)")
         self.redo_btn.clicked.connect(self.redo_requested.emit)
 
-        edit_block = self._create_block([self.undo_btn, self.redo_btn])
+        edit_layout = QHBoxLayout()
+        edit_layout.setSpacing(4)
+        edit_layout.addWidget(self.undo_btn)
+        edit_layout.addWidget(self.redo_btn)
 
-        # Zoom Block
+        # Zoom Group
         self.zoom_out_btn = TransparentToolButton(FIF.ZOOM_OUT)
         self.zoom_out_btn.setFixedSize(28, 28)
         self.zoom_out_btn.setIconSize(QSize(16, 16))
@@ -115,14 +117,16 @@ class StatusBarWidget(QWidget):
         self.zoom_in_btn.setToolTip("Zoom In (Ctrl+=)")
         self.zoom_in_btn.clicked.connect(self.zoom_in_requested.emit)
 
-        zoom_block = self._create_block(
-            [self.zoom_out_btn, self.zoom_reset_btn, self.zoom_in_btn]
-        )
+        zoom_layout = QHBoxLayout()
+        zoom_layout.setSpacing(4)
+        zoom_layout.addWidget(self.zoom_out_btn)
+        zoom_layout.addWidget(self.zoom_reset_btn)
+        zoom_layout.addWidget(self.zoom_in_btn)
 
-        # Save Block
+        # Save Group
         self.save_label = QLabel("✓ Saved")
         self.save_label.setStyleSheet(
-            f"color: {GlassColors.SUCCESS}; font-size: 11px; font-weight: 500;"
+            f"color: {GlassColors.SUCCESS}; font-size: 11px; font-weight: 500; margin-right: 8px;"
         )
 
         self.save_btn = TransparentToolButton(FIF.SAVE)
@@ -137,26 +141,30 @@ class StatusBarWidget(QWidget):
         self.save_as_btn.setToolTip("Save As... (Ctrl+Shift+S)")
         self.save_as_btn.clicked.connect(self.save_as_requested.emit)
 
-        save_block = self._create_block(
-            [self.save_label, self.save_btn, self.save_as_btn]
-        )
+        save_layout = QHBoxLayout()
+        save_layout.setSpacing(4)
+        save_layout.addWidget(self.save_btn)
+        save_layout.addWidget(self.save_as_btn)
 
-        # Search Block
+        # Search
         self.search_btn = TransparentToolButton(FIF.SEARCH)
         self.search_btn.setFixedSize(28, 28)
         self.search_btn.setIconSize(QSize(16, 16))
         self.search_btn.setToolTip("Search (Ctrl+F)")
         self.search_btn.clicked.connect(self.search_toggled.emit)
 
-        search_block = self._create_block([self.search_btn])
-
         # Assemble Layout
-        layout.addWidget(info_block)
+        layout.addWidget(self.stats_label)
+        layout.addWidget(self.cursor_label)
         layout.addStretch()
-        layout.addWidget(edit_block)
-        layout.addWidget(zoom_block)
-        layout.addWidget(search_block)
-        layout.addWidget(save_block)
+        layout.addLayout(edit_layout)
+        layout.addSpacing(16)
+        layout.addLayout(zoom_layout)
+        layout.addSpacing(16)
+        layout.addWidget(self.search_btn)
+        layout.addSpacing(16)
+        layout.addWidget(self.save_label)
+        layout.addLayout(save_layout)
 
     def _create_block(self, widgets):
         """Create a styled visual block containing widgets"""
@@ -252,7 +260,11 @@ class MainWindow(MSFluentWindow):
         """Connect settings changes to application updates"""
         self.settings.font_size_changed.connect(self._update_all_editors_font)
         self.settings.accent_changed.connect(self._update_application_accent)
-        self.settings.login_successful.connect(self.refresh_cloud_list)
+        # =============================================================================
+        # FUTURE: Cloud Signal Connection
+        # =============================================================================
+        if ENABLE_CLOUD:
+            self.settings.login_successful.connect(self.refresh_cloud_list)
         self.settings.logout_requested.connect(self._on_logout)
 
     def _update_all_editors_font(self, size):
@@ -315,7 +327,11 @@ class MainWindow(MSFluentWindow):
         self.hub.file_deleted.connect(self.close_tabs_with_path)
         self.hub.unlink_all_requested.connect(self.hub.unlink_all_notes)
         self.hub.delete_all_requested.connect(self.hub.delete_all_notes)
-        self.hub.login_btn.clicked.connect(self.login_google)
+        # =============================================================================
+        # FUTURE: Cloud Login Button Connection
+        # =============================================================================
+        if ENABLE_CLOUD and self.hub.login_btn is not None:
+            self.hub.login_btn.clicked.connect(self.login_google)
 
         # Settings view
         self.settings = SettingsView()
@@ -556,24 +572,27 @@ class MainWindow(MSFluentWindow):
             self.status_bar_frame.hide()
         self._save_session()
 
+    def _disconnect_editor_signals(self, editor):
+        """Safely disconnect all signals from an editor"""
+        if editor is None:
+            return
+        signals = [
+            editor.word_count_changed,
+            editor.cursor_position_changed,
+            editor.search_highlight_changed,
+        ]
+        for sig in signals:
+            try:
+                sig.disconnect()
+            except (TypeError, RuntimeError):
+                pass
+
     def _on_tab_changed(self, index):
         """Handle tab selection change"""
         if index >= 0:
             editor = self.tabs.widget(index)
             if editor and isinstance(editor, Editor):
-                # Connect signals for status bar updates
-                try:
-                    editor.word_count_changed.disconnect()
-                except:
-                    pass
-                try:
-                    editor.cursor_position_changed.disconnect()
-                except:
-                    pass
-                try:
-                    editor.search_highlight_changed.disconnect()
-                except:
-                    pass
+                self._disconnect_editor_signals(editor)
 
                 editor.word_count_changed.connect(self.status_widget.update_counts)
                 editor.cursor_position_changed.connect(self.status_widget.update_cursor)
@@ -581,7 +600,6 @@ class MainWindow(MSFluentWindow):
                     lambda count, idx: self.search_bar.set_match_count(count, idx)
                 )
 
-                # Trigger initial update
                 content = editor.get_content()
                 words = len(content.split()) if content.strip() else 0
                 chars = len(content)
@@ -592,7 +610,6 @@ class MainWindow(MSFluentWindow):
                     cursor.blockNumber() + 1, cursor.columnNumber() + 1
                 )
 
-                # Restore search highlights if search bar is active
                 if self.search_bar.isVisible():
                     search_text = self.search_bar.get_search_text()
                     if search_text:
@@ -615,19 +632,17 @@ class MainWindow(MSFluentWindow):
                 editor.set_font_size(size)
 
     def _on_logout(self):
-        """Handle Google Drive logout"""
-        drive_service.logout()
-
-        # Update hub
-        self.hub.update_cloud_list([])
-        self.update_hub_data()
-
-        InfoBar.success(
-            "Disconnected",
-            "Google Drive has been disconnected",
-            duration=3000,
-            parent=self,
-        )
+        """Handle Google Drive logout - NOT YET IMPLEMENTED"""
+        if ENABLE_CLOUD:
+            drive_service.logout()
+            self.hub.update_cloud_list([])
+            self.update_hub_data()
+            InfoBar.success(
+                "Disconnected",
+                "Google Drive has been disconnected",
+                duration=3000,
+                parent=self,
+            )
 
     def _zoom_in(self):
         """Zoom in current editor"""
@@ -771,13 +786,15 @@ class MainWindow(MSFluentWindow):
 
         self.hub.update_recent_list(valid_recents)
 
-        if config.settings.get("google_logged_in"):
+        if ENABLE_CLOUD and config.settings.get("google_logged_in"):
             self.refresh_cloud_list()
-        else:
+        elif ENABLE_CLOUD:
             self.hub.update_cloud_list([])
 
     def refresh_cloud_list(self):
-        """Fetch and display cloud notes"""
+        """Fetch and display cloud notes - NOT YET IMPLEMENTED"""
+        if not ENABLE_CLOUD:
+            return
         try:
             drive_notes = drive_service.list_notes()
             self.hub.update_cloud_list(drive_notes)
@@ -787,7 +804,9 @@ class MainWindow(MSFluentWindow):
             self.settings.update_cloud_status(False)
 
     def login_google(self):
-        """Initiate Google Drive authentication"""
+        """Initiate Google Drive authentication - NOT YET IMPLEMENTED"""
+        if not ENABLE_CLOUD:
+            return
         try:
             if drive_service.authenticate():
                 InfoBar.success(

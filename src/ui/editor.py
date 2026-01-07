@@ -60,6 +60,12 @@ class Editor(QPlainTextEdit):
 
         # File tracking
         self.file_path = None
+        # =============================================================================
+        # FUTURE: drive_id Attribute (Google Drive)
+        # =============================================================================
+        # Status: NOT YET IMPLEMENTED - UI is hidden
+        # To enable: Set ENABLE_CLOUD = True in src/logic/config.py
+        # =============================================================================
         self.drive_id = None
 
         # Search state
@@ -347,33 +353,22 @@ class Editor(QPlainTextEdit):
 
     def _find_all_matches(self, text, case_sensitive=False, whole_word=False):
         """Find all occurrences of text in the document"""
+        import re
+
         matches = []
         if not text:
             return matches
 
         content = self.toPlainText()
 
-        if not case_sensitive:
-            content = content.lower()
-            search_text = text.lower()
-        else:
-            search_text = text
-
         if whole_word:
-            import re
-
-            pattern = r"\b" + re.escape(search_text) + r"\b"
-            flags = re.IGNORECASE if not case_sensitive else 0
-            for match in re.finditer(pattern, content, flags):
-                matches.append(match.start())
+            pattern = r"\b" + re.escape(text) + r"\b"
         else:
-            start = 0
-            while True:
-                pos = content.find(search_text, start)
-                if pos == -1:
-                    break
-                matches.append(pos)
-                start = pos + 1
+            pattern = re.escape(text)
+
+        flags = 0 if case_sensitive else re.IGNORECASE
+        for match in re.finditer(pattern, content, flags):
+            matches.append(match.start())
 
         return matches
 
